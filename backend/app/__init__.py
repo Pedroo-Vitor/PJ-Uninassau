@@ -12,6 +12,7 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     cors.init_app(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 
+    from . import models  # noqa: F401
     from .routes import register_blueprints
     register_blueprints(app)
 

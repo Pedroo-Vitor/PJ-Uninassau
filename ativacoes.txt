@@ -1,0 +1,3 @@
+Ativar venv --> venv\Scripts\Activate.ps1
+Ativar front --> npm run dev
+Ativar container --> docker compose up -d
