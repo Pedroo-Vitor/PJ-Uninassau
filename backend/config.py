@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -12,3 +13,4 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "troque-esta-chave-em-dev")
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB por upload
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=8)

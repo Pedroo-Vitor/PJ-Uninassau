@@ -1,8 +1,16 @@
 from datetime import datetime
 
+from sqlalchemy.orm import validates
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from ..extensions import db
 
-PERFIS = ("assistido", "aluno", "professor", "gestao")
+PERFIL_ASSISTIDO = "assistido"
+PERFIL_ALUNO = "aluno"
+PERFIL_PROFESSOR = "professor"
+PERFIL_GESTAO = "gestao"
+
+PERFIS = (PERFIL_ASSISTIDO, PERFIL_ALUNO, PERFIL_PROFESSOR, PERFIL_GESTAO)
 
 
 class Usuario(db.Model):
@@ -20,6 +28,28 @@ class Usuario(db.Model):
     assistido = db.relationship("Assistido", back_populates="usuario", uselist=False)
     aluno = db.relationship("Aluno", back_populates="usuario", uselist=False)
     professor = db.relationship("Professor", back_populates="usuario", uselist=False)
+
+    @validates("perfil")
+    def _validar_perfil(self, _chave, valor):
+        if valor not in PERFIS:
+            raise ValueError(f"Perfil inválido: {valor!r}. Use um de {PERFIS}.")
+        return valor
+
+    @validates("email")
+    def _normalizar_email(self, _chave, valor):
+        return valor.strip().lower()
+
+    def set_senha(self, senha: str) -> None:
+        self.senha_hash = generate_password_hash(senha)
+
+    def check_senha(self, senha: str) -> bool:
+        return check_password_hash(self.senha_hash, senha)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id, "nome": self.nome, "email": self.email,
+            "perfil": self.perfil, "primeiro_acesso": self.primeiro_acesso,
+        }
 
     def __repr__(self):
         return f"<Usuario {self.email} ({self.perfil})>"
